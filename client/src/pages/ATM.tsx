@@ -42,9 +42,10 @@ export default function ATM() {
 
   const mutation = useMutation({
     mutationFn: (type: 'credit' | 'debit') => {
+      const numericAmount = parseFloat(amount);
       const transaction = type === 'credit'
-        ? { credit: Number(amount) }
-        : { debit: Number(amount) };
+        ? { credit: numericAmount }
+        : { debit: numericAmount };
       return api.performTransaction(selectedAccount.id, transaction);
     },
     onSuccess: () => {
@@ -52,9 +53,7 @@ export default function ATM() {
       setAmount("");
       setErrorOverride(undefined);
       setShowError(true);
-      // Show confetti animation
       setShowConfetti(true);
-      // Hide confetti after animation
       setTimeout(() => setShowConfetti(false), 2000);
     }
   });
@@ -62,6 +61,14 @@ export default function ATM() {
   const handleNumberPress = (num: number) => {
     if (amount.length < 10) {
       setAmount(prev => prev + num);
+      setErrorOverride(undefined);
+      setShowError(false);
+    }
+  };
+
+  const handleDecimalPoint = () => {
+    if (!amount.includes('.') && amount.length < 9) {
+      setAmount(prev => prev + '.');
       setErrorOverride(undefined);
       setShowError(false);
     }
@@ -127,6 +134,7 @@ export default function ATM() {
             <Keypad
               onNumberPress={handleNumberPress}
               onClear={handleClear}
+              onDecimalPoint={handleDecimalPoint}
             />
 
             <div className="grid grid-cols-2 gap-4">

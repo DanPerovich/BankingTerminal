@@ -3,9 +3,10 @@ import { Button } from "@/components/ui/button";
 interface KeypadProps {
   onNumberPress: (num: number) => void;
   onClear: () => void;
+  onDecimalPoint: () => void;
 }
 
-export function Keypad({ onNumberPress, onClear }: KeypadProps) {
+export function Keypad({ onNumberPress, onClear, onDecimalPoint }: KeypadProps) {
   return (
     <div className="grid grid-cols-3 gap-2 p-4 bg-gray-100 rounded-lg shadow-inner">
       {[1, 2, 3, 4, 5, 6, 7, 8, 9].map((num) => (
@@ -32,7 +33,13 @@ export function Keypad({ onNumberPress, onClear }: KeypadProps) {
       >
         0
       </Button>
-      <div /> {/* Empty space where Enter button was */}
+      <Button
+        variant="outline"
+        className="h-16 text-2xl font-bold bg-white hover:bg-gray-50"
+        onClick={onDecimalPoint}
+      >
+        .
+      </Button>
     </div>
   );
 }
