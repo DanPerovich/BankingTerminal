@@ -33,7 +33,7 @@ export function Display({ accountId, balance, message, isLoading, error }: Displ
               </div>
             ) : (
               <>
-                {balance !== undefined && (
+                {balance !== undefined && !error && (
                   <div className="mb-2">Balance: ${balance.toFixed(2)}</div>
                 )}
                 <div className="text-green-400">{message}</div>
