@@ -3,14 +3,23 @@ import { useQuery, useMutation } from "@tanstack/react-query";
 import { Display } from "@/components/atm/Display";
 import { Keypad } from "@/components/atm/Keypad";
 import { ConfigPanel } from "@/components/atm/ConfigPanel";
+import { AccountSelector } from "@/components/atm/AccountSelector";
 import { api } from "@/services/api";
 import { useAuth } from "@/contexts/AuthContext";
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 
+interface Account {
+  id: string;
+  label: string;
+}
+
 export default function ATM() {
   const [amount, setAmount] = useState("");
-  const [accountId, setAccountId] = useState("008"); // Changed default account
+  const [accounts, setAccounts] = useState<Account[]>([
+    { id: "008", label: "Main Account" }
+  ]);
+  const [selectedAccount, setSelectedAccount] = useState<Account>(accounts[0]);
   const [errorOverride, setErrorOverride] = useState<string | undefined>();
   const [showError, setShowError] = useState(true);
   const { authToken } = useAuth();
@@ -18,9 +27,9 @@ export default function ATM() {
   api.setAuthToken(authToken);
 
   const { data: balance, isLoading, error: queryError, refetch } = useQuery({
-    queryKey: ['balance', accountId],
-    queryFn: () => api.getBalance(accountId),
-    enabled: !!authToken && !!accountId,
+    queryKey: ['balance', selectedAccount.id],
+    queryFn: () => api.getBalance(selectedAccount.id),
+    enabled: !!authToken && !!selectedAccount.id,
     retry: false
   });
 
@@ -29,13 +38,13 @@ export default function ATM() {
       const transaction = type === 'credit'
         ? { credit: Number(amount) }
         : { debit: Number(amount) };
-      return api.performTransaction(accountId, transaction);
+      return api.performTransaction(selectedAccount.id, transaction);
     },
     onSuccess: () => {
       refetch();
       setAmount("");
       setErrorOverride(undefined);
-      setShowError(true); 
+      setShowError(true);
     }
   });
 
@@ -43,20 +52,21 @@ export default function ATM() {
     if (amount.length < 10) {
       setAmount(prev => prev + num);
       setErrorOverride(undefined);
-      setShowError(false); 
+      setShowError(false);
     }
   };
 
   const handleClear = () => {
     setAmount("");
     setErrorOverride(undefined);
-    setShowError(false); 
+    setShowError(false);
   };
 
-  const handleAccountIdChange = (newAccountId: string) => {
-    setAccountId(newAccountId);
+  const handleAccountAdd = (newAccount: Account) => {
+    setAccounts(prev => [...prev, newAccount]);
+    setSelectedAccount(newAccount);
     setErrorOverride(undefined);
-    setShowError(true); 
+    setShowError(true);
     setTimeout(() => refetch(), 0);
   };
 
@@ -78,21 +88,33 @@ export default function ATM() {
             />
             <h1 className="text-2xl font-bold text-gray-800">ATM Interface</h1>
           </div>
-          <ConfigPanel 
-            accountId={accountId}
-            onAccountIdChange={handleAccountIdChange}
+          <ConfigPanel
+            accountId={selectedAccount.id}
+            onAccountIdChange={(id) => {
+              const newAccount = { id, label: `Account ${id}` };
+              handleAccountAdd(newAccount);
+            }}
             initiallyOpen={true}
           />
         </div>
 
         <Card className="border-2">
           <CardContent className="p-6 space-y-4">
+            <div className="mb-4">
+              <AccountSelector
+                accounts={accounts}
+                selectedAccount={selectedAccount}
+                onAccountSelect={setSelectedAccount}
+                onAccountAdd={handleAccountAdd}
+              />
+            </div>
+
             <Display
-              accountId={accountId}
+              accountId={selectedAccount.id}
               balance={balance?.balance}
               message={displayMessage}
               isLoading={isLoading || mutation.isPending}
-              error={showError ? errorMessage : undefined} 
+              error={showError ? errorMessage : undefined}
             />
 
             <Keypad

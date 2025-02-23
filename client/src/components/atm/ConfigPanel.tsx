@@ -6,25 +6,20 @@ import { useAuth } from "@/contexts/AuthContext";
 import { useState, useEffect } from "react";
 
 interface ConfigPanelProps {
-  accountId: string;
-  onAccountIdChange: (id: string) => void;
   initiallyOpen?: boolean;
 }
 
-export function ConfigPanel({ accountId, onAccountIdChange, initiallyOpen = false }: ConfigPanelProps) {
+export function ConfigPanel({ initiallyOpen = false }: ConfigPanelProps) {
   const { authToken, setAuthToken } = useAuth();
   const [tempToken, setTempToken] = useState(authToken);
-  const [tempAccountId, setTempAccountId] = useState(accountId);
   const [open, setOpen] = useState(initiallyOpen);
 
   useEffect(() => {
     setTempToken(authToken);
-    setTempAccountId(accountId);
-  }, [authToken, accountId]);
+  }, [authToken]);
 
   const handleSave = () => {
     setAuthToken(tempToken);
-    onAccountIdChange(tempAccountId);
     setOpen(false);
   };
 
@@ -40,15 +35,6 @@ export function ConfigPanel({ accountId, onAccountIdChange, initiallyOpen = fals
           <DialogTitle>ATM Configuration</DialogTitle>
         </DialogHeader>
         <div className="space-y-4">
-          <div>
-            <label className="text-sm font-medium">Account ID</label>
-            <Input
-              value={tempAccountId}
-              onChange={(e) => setTempAccountId(e.target.value)}
-              placeholder="Enter account ID"
-              className="mt-1"
-            />
-          </div>
           <div>
             <label className="text-sm font-medium">Authorization Header</label>
             <Input
