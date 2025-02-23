@@ -18,17 +18,12 @@ export const api = {
   async getBalance(accountId: string): Promise<AccountBalance> {
     try {
       const response = await axios.get(`${BASE_URL}/accounts/${accountId}`);
-      console.log('API Response:', response.data); // Debug log
+      console.log('Raw API Response:', response.data); // Debug log the entire response
 
-      // Convert the balance to a number, allowing 0 as a valid value
-      const balance = Number(response.data.balance);
-      if (isNaN(balance)) {
-        throw new ApiError("Invalid balance format in response");
-      }
-
+      // Get the balance value directly from response.data
       return {
         accountId: parseInt(accountId),
-        balance: balance
+        balance: Number(response.data.balance)
       };
     } catch (error: any) {
       console.log('API Error:', error.response?.data); // Debug log
