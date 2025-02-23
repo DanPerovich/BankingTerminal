@@ -1,0 +1,98 @@
+openapi: 3.0.1
+info:
+  title: Demo REST - Stateful Mocking
+  version: 1.0.0
+servers:
+- url: https://reststatefulmocking.wiremockapi.cloud
+paths:
+  /accounts/{accountId}:
+    get:
+      summary: Get accounts by accountId.
+      operationId: getAccountsByAccountId
+      parameters:
+      - name: accountId
+        in: path
+        required: true
+        style: simple
+        explode: false
+        schema:
+          type: string
+      responses:
+        "200":
+          description: Get balance for account
+          content:
+            application/json:
+              schema:
+                required:
+                - respnose
+                type: object
+                properties:
+                - accountId:
+                    type: int
+                    example: 123
+                - balance:
+                    type: int
+                    example: 123
+        "404":
+          description: Get balance for account (not initialized)
+          content:
+            application/json:
+              schema:
+                required:
+                - error
+                type: object
+                properties:
+                  error:
+                    type: string
+                    example: Account not initialized.
+                x-wiremock-hash: -497785219
+              examples:
+                Get balance for account (not initialized):
+                  value: |-
+                    {
+                      "error" : "Account not initialized."
+                    }
+    post:
+      summary: Post accounts by accountId.
+      description: Post accounts by accountId.
+      operationId: postAccountsByAccountId
+      parameters:
+      - name: accountId
+        in: path
+        required: true
+        style: simple
+        explode: false
+        schema:
+          type: string
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                debit:
+                  type: number
+                  example: 100
+                credit:
+                  type: number
+                  example: 100
+            examples:
+              Credit account:
+                value: |-
+                  {
+                    "credit" : 100
+                  }
+              Debit account:
+                value: |-
+                  {
+                    "debit" : 100
+                  }
+        required: true
+      responses:
+        "204":
+          description: Debit account
+          content:
+            application/json:
+              examples:
+                Credit account:
+                  value: ""
