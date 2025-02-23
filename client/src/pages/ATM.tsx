@@ -12,6 +12,7 @@ export default function ATM() {
   const [amount, setAmount] = useState("");
   const [accountId, setAccountId] = useState("123"); // Default account
   const [errorOverride, setErrorOverride] = useState<string | undefined>();
+  const [showError, setShowError] = useState(true); // New state to control error visibility
   const { authToken } = useAuth();
 
   api.setAuthToken(authToken);
@@ -34,24 +35,28 @@ export default function ATM() {
       refetch();
       setAmount("");
       setErrorOverride(undefined);
+      setShowError(true); // Reset error visibility on successful transaction
     }
   });
 
   const handleNumberPress = (num: number) => {
     if (amount.length < 10) {
       setAmount(prev => prev + num);
-      setErrorOverride(undefined); // Clear error when typing
+      setErrorOverride(undefined);
+      setShowError(false); // Hide error when typing
     }
   };
 
   const handleClear = () => {
     setAmount("");
-    setErrorOverride(undefined); // Clear error when clearing
+    setErrorOverride(undefined);
+    setShowError(false); // Hide error when clearing
   };
 
   const handleAccountIdChange = (newAccountId: string) => {
     setAccountId(newAccountId);
     setErrorOverride(undefined);
+    setShowError(true); // Show any potential errors when changing accounts
     setTimeout(() => refetch(), 0);
   };
 
@@ -82,7 +87,7 @@ export default function ATM() {
               balance={balance?.balance}
               message={displayMessage}
               isLoading={isLoading || mutation.isPending}
-              error={amount ? undefined : errorMessage} // Only show error if no amount is entered
+              error={showError ? errorMessage : undefined} // Only show error if showError is true
             />
 
             <Keypad
