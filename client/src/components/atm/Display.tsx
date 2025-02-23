@@ -17,27 +17,29 @@ export function Display({ accountId, balance, message, isLoading, error }: Displ
       <div className="text-2xl font-bold mb-4">
         {isLoading ? (
           <Skeleton className="h-8 w-3/4 bg-gray-700" />
-        ) : error ? (
-          <div>
-            <div className="text-sm text-gray-400 mb-2">Account ID: {accountId}</div>
-            <div className={isUninitializedError ? "text-yellow-400" : "text-red-400"}>
-              {isUninitializedError ? (
-                <>
-                  Account not initialized.<br />
-                  <span className="text-sm">Make an initial credit to activate the account.</span>
-                </>
-              ) : (
-                error
-              )}
-            </div>
-          </div>
         ) : (
           <div>
             <div className="text-sm text-gray-400 mb-2">Account ID: {accountId}</div>
-            {balance !== undefined && (
-              <div className="mb-2">Balance: ${balance.toFixed(2)}</div>
+            {message.startsWith("Amount: $") ? (
+              // Show amount when user is entering numbers
+              <div className="text-green-400">{message}</div>
+            ) : error ? (
+              <div className={isUninitializedError ? "text-yellow-400" : "text-red-400"}>
+                {isUninitializedError ? (
+                  <>
+                    Account not initialized.<br />
+                    <span className="text-sm">Make an initial credit to activate the account.</span>
+                  </>
+                ) : (
+                  error
+                )}
+              </div>
+            ) : balance !== undefined && (
+              <div>
+                <div className="mb-2">Balance: ${balance.toFixed(2)}</div>
+                <div className="text-green-400">{message}</div>
+              </div>
             )}
-            <div className="text-green-400">{message}</div>
           </div>
         )}
       </div>
