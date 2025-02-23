@@ -5,9 +5,20 @@ import { Settings } from "lucide-react";
 import { useAuth } from "@/contexts/AuthContext";
 import { useState } from "react";
 
-export function ConfigPanel() {
+interface ConfigPanelProps {
+  accountId: string;
+  onAccountIdChange: (id: string) => void;
+}
+
+export function ConfigPanel({ accountId, onAccountIdChange }: ConfigPanelProps) {
   const { authToken, setAuthToken } = useAuth();
   const [tempToken, setTempToken] = useState(authToken);
+  const [tempAccountId, setTempAccountId] = useState(accountId);
+
+  const handleSave = () => {
+    setAuthToken(tempToken);
+    onAccountIdChange(tempAccountId);
+  };
 
   return (
     <Dialog>
@@ -18,9 +29,18 @@ export function ConfigPanel() {
       </DialogTrigger>
       <DialogContent>
         <DialogHeader>
-          <DialogTitle>API Configuration</DialogTitle>
+          <DialogTitle>ATM Configuration</DialogTitle>
         </DialogHeader>
         <div className="space-y-4">
+          <div>
+            <label className="text-sm font-medium">Account ID</label>
+            <Input
+              value={tempAccountId}
+              onChange={(e) => setTempAccountId(e.target.value)}
+              placeholder="Enter account ID"
+              className="mt-1"
+            />
+          </div>
           <div>
             <label className="text-sm font-medium">Authorization Header</label>
             <Input
@@ -30,7 +50,7 @@ export function ConfigPanel() {
               className="mt-1"
             />
           </div>
-          <Button onClick={() => setAuthToken(tempToken)}>Save Configuration</Button>
+          <Button onClick={handleSave}>Save Configuration</Button>
         </div>
       </DialogContent>
     </Dialog>

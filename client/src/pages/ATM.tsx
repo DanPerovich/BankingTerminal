@@ -10,15 +10,15 @@ import { Button } from "@/components/ui/button";
 
 export default function ATM() {
   const [amount, setAmount] = useState("");
-  const [accountId, setAccountId] = useState("123"); // Demo account
+  const [accountId, setAccountId] = useState("123"); // Default account
   const { authToken } = useAuth();
-  
+
   api.setAuthToken(authToken);
 
   const { data: balance, isLoading, error, refetch } = useQuery({
     queryKey: ['balance', accountId],
     queryFn: () => api.getBalance(accountId),
-    enabled: !!authToken
+    enabled: !!authToken && !!accountId
   });
 
   const mutation = useMutation({
@@ -42,17 +42,26 @@ export default function ATM() {
 
   const handleClear = () => setAmount("");
 
+  const handleAccountIdChange = (newAccountId: string) => {
+    setAccountId(newAccountId);
+    refetch();
+  };
+
   return (
     <div className="min-h-screen bg-gray-100 p-4">
       <div className="max-w-md mx-auto space-y-4">
         <div className="flex justify-between items-center">
           <h1 className="text-2xl font-bold text-gray-800">ATM Interface</h1>
-          <ConfigPanel />
+          <ConfigPanel 
+            accountId={accountId}
+            onAccountIdChange={handleAccountIdChange}
+          />
         </div>
 
         <Card className="border-2">
           <CardContent className="p-6 space-y-4">
             <Display
+              accountId={accountId}
               balance={balance?.balance}
               message={amount ? `Amount: $${amount}` : "Enter amount"}
               isLoading={isLoading || mutation.isPending}
