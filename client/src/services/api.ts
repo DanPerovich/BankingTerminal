@@ -26,7 +26,7 @@ export const api = {
     } catch (error: any) {
       console.log('API Error:', error.response?.data); // Debug log
       if (error.response?.status === 404 && 
-          error.response?.data?.error === "Account not initialized") {
+          error.response?.data?.error === "Account not initialized.") {
         throw new ApiError("Account not initialized - Make an initial credit to activate the account");
       }
       throw error;
