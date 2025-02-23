@@ -76,7 +76,7 @@ export default function ATM() {
           <div className="flex items-center gap-4">
             <h1 className="text-2xl font-bold text-gray-800">ATM Interface</h1>
             <img 
-              src="/attached_assets/668516ff2492ff79aa390de3_wiremock-cloud-logo-1200px.png" 
+              src="/assets/668516ff2492ff79aa390de3_wiremock-cloud-logo-1200px.png" 
               alt="WireMock Cloud Logo"
               className="h-8 object-contain"
             />
