@@ -11,6 +11,7 @@ import { Button } from "@/components/ui/button";
 export default function ATM() {
   const [amount, setAmount] = useState("");
   const [accountId, setAccountId] = useState("123"); // Default account
+  const [errorOverride, setErrorOverride] = useState<string | undefined>();
   const { authToken } = useAuth();
 
   api.setAuthToken(authToken);
@@ -19,15 +20,7 @@ export default function ATM() {
     queryKey: ['balance', accountId],
     queryFn: () => api.getBalance(accountId),
     enabled: !!authToken && !!accountId,
-    retry: false // Don't retry on error since we want to show the error message
-  });
-
-  console.log('Query State:', { // Debug log
-    balance,
-    isLoading,
-    error: queryError,
-    accountId,
-    responseBalance: balance?.balance
+    retry: false
   });
 
   const mutation = useMutation({
@@ -40,25 +33,33 @@ export default function ATM() {
     onSuccess: () => {
       refetch();
       setAmount("");
+      setErrorOverride(undefined);
     }
   });
 
   const handleNumberPress = (num: number) => {
     if (amount.length < 10) {
       setAmount(prev => prev + num);
+      setErrorOverride(undefined); // Clear error when typing
     }
   };
 
-  const handleClear = () => setAmount("");
+  const handleClear = () => {
+    setAmount("");
+    setErrorOverride(undefined); // Clear error when clearing
+  };
 
   const handleAccountIdChange = (newAccountId: string) => {
     setAccountId(newAccountId);
-    // Force a refetch when account ID changes
+    setErrorOverride(undefined);
     setTimeout(() => refetch(), 0);
   };
 
   // Extract error message from either query or mutation error
-  const errorMessage = queryError instanceof Error ? queryError.message : mutation.error instanceof Error ? mutation.error.message : undefined;
+  const errorMessage = errorOverride ?? (queryError instanceof Error ? queryError.message : mutation.error instanceof Error ? mutation.error.message : undefined);
+
+  // Check if account is not initialized
+  const isAccountNotInitialized = errorMessage?.includes("Account not initialized");
 
   return (
     <div className="min-h-screen bg-gray-100 p-4">
@@ -84,7 +85,6 @@ export default function ATM() {
             <Keypad
               onNumberPress={handleNumberPress}
               onClear={handleClear}
-              onEnter={() => {}}
             />
 
             <div className="grid grid-cols-2 gap-4">
@@ -97,7 +97,7 @@ export default function ATM() {
               </Button>
               <Button
                 onClick={() => mutation.mutate('debit')}
-                disabled={!amount || mutation.isPending}
+                disabled={!amount || mutation.isPending || isAccountNotInitialized}
                 className="bg-blue-600 hover:bg-blue-700"
               >
                 Debit
