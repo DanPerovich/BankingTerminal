@@ -26,7 +26,7 @@ export default function ATM() {
 
   const mutation = useMutation({
     mutationFn: (type: 'credit' | 'debit') => {
-      const transaction = type === 'credit' 
+      const transaction = type === 'credit'
         ? { credit: Number(amount) }
         : { debit: Number(amount) };
       return api.performTransaction(accountId, transaction);
@@ -74,12 +74,12 @@ export default function ATM() {
       <div className="max-w-md mx-auto space-y-4">
         <div className="flex justify-between items-center">
           <div className="flex items-center gap-4">
-            <h1 className="text-2xl font-bold text-gray-800">ATM Interface</h1>
             <img 
               src="/assets/668516ff2492ff79aa390de3_wiremock-cloud-logo-1200px.png" 
               alt="WireMock Cloud Logo"
               className="h-8 object-contain"
             />
+            <h1 className="text-2xl font-bold text-gray-800">ATM Interface</h1>
           </div>
           <ConfigPanel 
             accountId={accountId}
