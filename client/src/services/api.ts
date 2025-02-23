@@ -18,11 +18,13 @@ export const api = {
   async getBalance(accountId: string): Promise<AccountBalance> {
     try {
       const response = await axios.get(`${BASE_URL}/accounts/${accountId}`);
+      console.log('API Response:', response.data); // Debug log
       return {
         accountId: Number(accountId),
-        balance: response.data.balance
+        balance: response.data.balance || 0 // Ensure we have a default value
       };
     } catch (error: any) {
+      console.log('API Error:', error.response?.data); // Debug log
       if (error.response?.status === 404 && 
           error.response?.data?.error === "Account not initialized") {
         throw new ApiError("Account not initialized - Make an initial credit to activate the account");

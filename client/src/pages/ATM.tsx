@@ -21,6 +21,13 @@ export default function ATM() {
     enabled: !!authToken && !!accountId
   });
 
+  console.log('Query State:', { // Debug log
+    balance,
+    isLoading,
+    error,
+    accountId
+  });
+
   const mutation = useMutation({
     mutationFn: (type: 'credit' | 'debit') => {
       const transaction = type === 'credit' 
@@ -65,7 +72,7 @@ export default function ATM() {
               balance={balance?.balance}
               message={amount ? `Amount: $${amount}` : "Enter amount"}
               isLoading={isLoading || mutation.isPending}
-              error={error?.message || mutation.error?.message}
+              error={error instanceof Error ? error.message : undefined}
             />
 
             <Keypad
