@@ -26,7 +26,8 @@ export default function ATM() {
     balance,
     isLoading,
     error: queryError,
-    accountId
+    accountId,
+    responseBalance: balance?.balance
   });
 
   const mutation = useMutation({
@@ -52,7 +53,8 @@ export default function ATM() {
 
   const handleAccountIdChange = (newAccountId: string) => {
     setAccountId(newAccountId);
-    refetch();
+    // Force a refetch when account ID changes
+    setTimeout(() => refetch(), 0);
   };
 
   // Extract error message from either query or mutation error
