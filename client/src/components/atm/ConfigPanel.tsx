@@ -14,14 +14,16 @@ export function ConfigPanel({ accountId, onAccountIdChange }: ConfigPanelProps) 
   const { authToken, setAuthToken } = useAuth();
   const [tempToken, setTempToken] = useState(authToken);
   const [tempAccountId, setTempAccountId] = useState(accountId);
+  const [open, setOpen] = useState(false);
 
   const handleSave = () => {
     setAuthToken(tempToken);
     onAccountIdChange(tempAccountId);
+    setOpen(false); // Close the dialog after saving
   };
 
   return (
-    <Dialog>
+    <Dialog open={open} onOpenChange={setOpen}>
       <DialogTrigger asChild>
         <Button variant="outline" size="icon">
           <Settings className="h-4 w-4" />

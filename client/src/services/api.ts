@@ -10,7 +10,11 @@ export const api = {
 
   async getBalance(accountId: string): Promise<AccountBalance> {
     const response = await axios.get(`${BASE_URL}/accounts/${accountId}`);
-    return response.data;
+    // Extract balance from the response according to the OpenAPI spec
+    return {
+      accountId: Number(accountId),
+      balance: response.data.balance
+    };
   },
 
   async performTransaction(accountId: string, transaction: Transaction): Promise<void> {
