@@ -18,12 +18,23 @@ export const api = {
   async getBalance(accountId: string): Promise<AccountBalance> {
     try {
       const response = await axios.get(`${BASE_URL}/accounts/${accountId}`);
-      console.log('Raw API Response:', response.data); // Debug log the entire response
+      console.log('Raw API Response:', response.data); // Debug log
 
-      // Get the balance value directly from response.data
+      // Ensure we have a valid balance value
+      const rawBalance = response.data.balance;
+      const balance = typeof rawBalance === 'number' ? rawBalance : Number(rawBalance);
+
+      if (typeof rawBalance === 'undefined' || rawBalance === null) {
+        throw new ApiError("Balance not found in response");
+      }
+
+      if (isNaN(balance)) {
+        throw new ApiError(`Invalid balance value: ${rawBalance}`);
+      }
+
       return {
         accountId: parseInt(accountId),
-        balance: Number(response.data.balance)
+        balance: balance
       };
     } catch (error: any) {
       console.log('API Error:', error.response?.data); // Debug log
