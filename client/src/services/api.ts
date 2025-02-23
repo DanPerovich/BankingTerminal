@@ -1,7 +1,7 @@
 import axios from 'axios';
 import { AccountBalance, Transaction } from '@shared/schema';
 
-const BASE_URL = 'https://reststatefulmocking.wiremockapi.cloud';
+const BASE_URL = 'https://statefuldoublecontext.wiremockapi.cloud';
 
 class ApiError extends Error {
   constructor(message: string) {
