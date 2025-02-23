@@ -47,7 +47,12 @@ export const api = {
       }
 
       const data = await response.json();
-      const balance = typeof data.balance === 'number' ? data.balance : parseInt(data.balance);
+
+      // Handle both direct response and nested response structure
+      const balanceData = data.respnose || data;
+      const balance = typeof balanceData.balance === 'number' 
+        ? balanceData.balance 
+        : parseInt(balanceData.balance);
 
       if (isNaN(balance)) {
         throw new ApiError("Invalid balance value received from server");
