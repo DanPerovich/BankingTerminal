@@ -20,10 +20,7 @@ export function Display({ accountId, balance, message, isLoading, error }: Displ
         ) : (
           <div>
             <div className="text-sm text-gray-400 mb-2">Account ID: {accountId}</div>
-            {message.startsWith("Amount: $") ? (
-              // Show amount when user is entering numbers
-              <div className="text-green-400">{message}</div>
-            ) : error ? (
+            {error ? (
               <div className={isUninitializedError ? "text-yellow-400" : "text-red-400"}>
                 {isUninitializedError ? (
                   <>
@@ -34,11 +31,13 @@ export function Display({ accountId, balance, message, isLoading, error }: Displ
                   error
                 )}
               </div>
-            ) : balance !== undefined && (
-              <div>
-                <div className="mb-2">Balance: ${balance.toFixed(2)}</div>
+            ) : (
+              <>
+                {balance !== undefined && (
+                  <div className="mb-2">Balance: ${balance.toFixed(2)}</div>
+                )}
                 <div className="text-green-400">{message}</div>
-              </div>
+              </>
             )}
           </div>
         )}
