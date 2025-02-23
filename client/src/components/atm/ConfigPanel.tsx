@@ -3,23 +3,29 @@ import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Settings } from "lucide-react";
 import { useAuth } from "@/contexts/AuthContext";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 
 interface ConfigPanelProps {
   accountId: string;
   onAccountIdChange: (id: string) => void;
+  initiallyOpen?: boolean;
 }
 
-export function ConfigPanel({ accountId, onAccountIdChange }: ConfigPanelProps) {
+export function ConfigPanel({ accountId, onAccountIdChange, initiallyOpen = false }: ConfigPanelProps) {
   const { authToken, setAuthToken } = useAuth();
   const [tempToken, setTempToken] = useState(authToken);
   const [tempAccountId, setTempAccountId] = useState(accountId);
-  const [open, setOpen] = useState(false);
+  const [open, setOpen] = useState(initiallyOpen);
+
+  useEffect(() => {
+    setTempToken(authToken);
+    setTempAccountId(accountId);
+  }, [authToken, accountId]);
 
   const handleSave = () => {
     setAuthToken(tempToken);
     onAccountIdChange(tempAccountId);
-    setOpen(false); // Close the dialog after saving
+    setOpen(false);
   };
 
   return (

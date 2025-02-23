@@ -10,9 +10,9 @@ import { Button } from "@/components/ui/button";
 
 export default function ATM() {
   const [amount, setAmount] = useState("");
-  const [accountId, setAccountId] = useState("123"); // Default account
+  const [accountId, setAccountId] = useState("008"); // Changed default account
   const [errorOverride, setErrorOverride] = useState<string | undefined>();
-  const [showError, setShowError] = useState(true); // New state to control error visibility
+  const [showError, setShowError] = useState(true);
   const { authToken } = useAuth();
 
   api.setAuthToken(authToken);
@@ -35,7 +35,7 @@ export default function ATM() {
       refetch();
       setAmount("");
       setErrorOverride(undefined);
-      setShowError(true); // Reset error visibility on successful transaction
+      setShowError(true); 
     }
   });
 
@@ -43,30 +43,27 @@ export default function ATM() {
     if (amount.length < 10) {
       setAmount(prev => prev + num);
       setErrorOverride(undefined);
-      setShowError(false); // Hide error when typing
+      setShowError(false); 
     }
   };
 
   const handleClear = () => {
     setAmount("");
     setErrorOverride(undefined);
-    setShowError(false); // Hide error when clearing
+    setShowError(false); 
   };
 
   const handleAccountIdChange = (newAccountId: string) => {
     setAccountId(newAccountId);
     setErrorOverride(undefined);
-    setShowError(true); // Show any potential errors when changing accounts
+    setShowError(true); 
     setTimeout(() => refetch(), 0);
   };
 
-  // Extract error message from either query or mutation error
   const errorMessage = errorOverride ?? (queryError instanceof Error ? queryError.message : mutation.error instanceof Error ? mutation.error.message : undefined);
 
-  // Check if account is not initialized
   const isAccountNotInitialized = errorMessage?.includes("Account not initialized");
 
-  // Determine the display message
   const displayMessage = amount ? `Amount: $${amount}` : "Enter amount";
 
   return (
@@ -84,6 +81,7 @@ export default function ATM() {
           <ConfigPanel 
             accountId={accountId}
             onAccountIdChange={handleAccountIdChange}
+            initiallyOpen={true}
           />
         </div>
 
@@ -94,7 +92,7 @@ export default function ATM() {
               balance={balance?.balance}
               message={displayMessage}
               isLoading={isLoading || mutation.isPending}
-              error={showError ? errorMessage : undefined} // Only show error if showError is true
+              error={showError ? errorMessage : undefined} 
             />
 
             <Keypad
