@@ -4,6 +4,7 @@ import { Display } from "@/components/atm/Display";
 import { Keypad } from "@/components/atm/Keypad";
 import { ConfigPanel } from "@/components/atm/ConfigPanel";
 import { AccountSelector } from "@/components/atm/AccountSelector";
+import { Confetti } from "@/components/atm/Confetti";
 import { api } from "@/services/api";
 import { useAuth } from "@/contexts/AuthContext";
 import { Card, CardContent } from "@/components/ui/card";
@@ -22,6 +23,7 @@ export default function ATM() {
   const [selectedAccount, setSelectedAccount] = useState<Account>(accounts[0]);
   const [errorOverride, setErrorOverride] = useState<string | undefined>();
   const [showError, setShowError] = useState(true);
+  const [showConfetti, setShowConfetti] = useState(false);
   const { authToken } = useAuth();
 
   api.setAuthToken(authToken);
@@ -50,6 +52,10 @@ export default function ATM() {
       setAmount("");
       setErrorOverride(undefined);
       setShowError(true);
+      // Show confetti animation
+      setShowConfetti(true);
+      // Hide confetti after animation
+      setTimeout(() => setShowConfetti(false), 2000);
     }
   });
 
@@ -82,6 +88,7 @@ export default function ATM() {
 
   return (
     <div className="min-h-screen bg-gray-100 p-4">
+      <Confetti isVisible={showConfetti} />
       <div className="max-w-md mx-auto space-y-4">
         <div className="flex justify-between items-center">
           <div className="flex items-center gap-4">
