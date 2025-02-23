@@ -9,6 +9,7 @@ import { api } from "@/services/api";
 import { useAuth } from "@/contexts/AuthContext";
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
+import { ThemeToggle } from "@/components/ui/theme-toggle";
 
 interface Account {
   id: string;
@@ -94,7 +95,7 @@ export default function ATM() {
   const displayMessage = amount ? `Amount: $${amount}` : "Enter amount";
 
   return (
-    <div className="min-h-screen bg-gray-100 p-4">
+    <div className="min-h-screen bg-gray-100 p-4 dark:bg-gray-900">
       <Confetti isVisible={showConfetti} />
       <div className="max-w-md mx-auto space-y-4">
         <div className="flex justify-between items-center">
@@ -104,12 +105,15 @@ export default function ATM() {
               alt="WireMock Cloud Logo"
               className="h-8 object-contain"
             />
-            <h1 className="text-2xl font-bold text-gray-800">ATM Interface</h1>
+            <h1 className="text-2xl font-bold text-gray-800 dark:text-gray-200">ATM Interface</h1>
           </div>
-          <ConfigPanel
-            onConfigChange={refetch}
-            initiallyOpen={true}
-          />
+          <div className="flex items-center gap-2">
+            <ThemeToggle />
+            <ConfigPanel
+              onConfigChange={refetch}
+              initiallyOpen={true}
+            />
+          </div>
         </div>
 
         <Card className="border-2">
