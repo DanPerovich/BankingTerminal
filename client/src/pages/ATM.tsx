@@ -15,16 +15,17 @@ export default function ATM() {
 
   api.setAuthToken(authToken);
 
-  const { data: balance, isLoading, error, refetch } = useQuery({
+  const { data: balance, isLoading, error: queryError, refetch } = useQuery({
     queryKey: ['balance', accountId],
     queryFn: () => api.getBalance(accountId),
-    enabled: !!authToken && !!accountId
+    enabled: !!authToken && !!accountId,
+    retry: false // Don't retry on error since we want to show the error message
   });
 
   console.log('Query State:', { // Debug log
     balance,
     isLoading,
-    error,
+    error: queryError,
     accountId
   });
 
@@ -54,6 +55,9 @@ export default function ATM() {
     refetch();
   };
 
+  // Extract error message from either query or mutation error
+  const errorMessage = queryError instanceof Error ? queryError.message : mutation.error instanceof Error ? mutation.error.message : undefined;
+
   return (
     <div className="min-h-screen bg-gray-100 p-4">
       <div className="max-w-md mx-auto space-y-4">
@@ -72,7 +76,7 @@ export default function ATM() {
               balance={balance?.balance}
               message={amount ? `Amount: $${amount}` : "Enter amount"}
               isLoading={isLoading || mutation.isPending}
-              error={error instanceof Error ? error.message : undefined}
+              error={errorMessage}
             />
 
             <Keypad
