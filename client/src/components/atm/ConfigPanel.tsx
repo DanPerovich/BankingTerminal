@@ -7,9 +7,10 @@ import { useState, useEffect } from "react";
 
 interface ConfigPanelProps {
   initiallyOpen?: boolean;
+  onConfigChange?: () => void;
 }
 
-export function ConfigPanel({ initiallyOpen = false }: ConfigPanelProps) {
+export function ConfigPanel({ initiallyOpen = false, onConfigChange }: ConfigPanelProps) {
   const { authToken, setAuthToken } = useAuth();
   const [tempToken, setTempToken] = useState(authToken);
   const [open, setOpen] = useState(initiallyOpen);
@@ -21,6 +22,7 @@ export function ConfigPanel({ initiallyOpen = false }: ConfigPanelProps) {
   const handleSave = () => {
     setAuthToken(tempToken);
     setOpen(false);
+    onConfigChange?.();
   };
 
   return (

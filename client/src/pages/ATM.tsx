@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useQuery, useMutation } from "@tanstack/react-query";
 import { Display } from "@/components/atm/Display";
 import { Keypad } from "@/components/atm/Keypad";
@@ -27,11 +27,16 @@ export default function ATM() {
   api.setAuthToken(authToken);
 
   const { data: balance, isLoading, error: queryError, refetch } = useQuery({
-    queryKey: ['balance', selectedAccount.id],
+    queryKey: ['balance', selectedAccount.id, authToken],
     queryFn: () => api.getBalance(selectedAccount.id),
     enabled: !!authToken && !!selectedAccount.id,
     retry: false
   });
+
+  // Refetch balance when account or auth token changes
+  useEffect(() => {
+    refetch();
+  }, [selectedAccount.id, authToken, refetch]);
 
   const mutation = useMutation({
     mutationFn: (type: 'credit' | 'debit') => {
@@ -67,7 +72,6 @@ export default function ATM() {
     setSelectedAccount(newAccount);
     setErrorOverride(undefined);
     setShowError(true);
-    setTimeout(() => refetch(), 0);
   };
 
   const errorMessage = errorOverride ?? (queryError instanceof Error ? queryError.message : mutation.error instanceof Error ? mutation.error.message : undefined);
@@ -89,11 +93,7 @@ export default function ATM() {
             <h1 className="text-2xl font-bold text-gray-800">ATM Interface</h1>
           </div>
           <ConfigPanel
-            accountId={selectedAccount.id}
-            onAccountIdChange={(id) => {
-              const newAccount = { id, label: `Account ${id}` };
-              handleAccountAdd(newAccount);
-            }}
+            onConfigChange={refetch}
             initiallyOpen={true}
           />
         </div>
