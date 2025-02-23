@@ -25,12 +25,23 @@ export const api = {
       if (!response.ok) {
         const errorText = await response.text();
         try {
-          const errorJson = JSON.parse(errorText);
-          if (errorJson.error === "Account not initialized.") {
+          // Only try to parse as JSON if it starts with {
+          if (errorText.trim().startsWith('{')) {
+            const errorJson = JSON.parse(errorText);
+            if (errorJson.error === "Account not initialized.") {
+              throw new ApiError("Account not initialized.");
+            }
+            throw new ApiError(errorJson.error);
+          }
+          // If it's not JSON, just use the text directly
+          if (errorText.includes("Account not initialized")) {
             throw new ApiError("Account not initialized.");
           }
-          throw new ApiError(errorJson.error);
+          throw new ApiError(errorText || response.statusText);
         } catch (e) {
+          if (e instanceof ApiError) {
+            throw e;
+          }
           throw new ApiError(errorText || response.statusText);
         }
       }
@@ -67,9 +78,15 @@ export const api = {
     if (!response.ok) {
       const errorText = await response.text();
       try {
-        const errorJson = JSON.parse(errorText);
-        throw new ApiError(errorJson.error || errorText);
+        if (errorText.trim().startsWith('{')) {
+          const errorJson = JSON.parse(errorText);
+          throw new ApiError(errorJson.error || errorText);
+        }
+        throw new ApiError(errorText || response.statusText);
       } catch (e) {
+        if (e instanceof ApiError) {
+          throw e;
+        }
         throw new ApiError(errorText || response.statusText);
       }
     }
