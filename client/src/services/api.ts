@@ -1,4 +1,3 @@
-import axios from 'axios';
 import { AccountBalance, Transaction } from '@shared/schema';
 
 const BASE_URL = 'https://statefuldoublecontext.wiremockapi.cloud';
@@ -11,42 +10,68 @@ class ApiError extends Error {
 }
 
 export const api = {
+  token: '',
+
   setAuthToken(token: string) {
-    axios.defaults.headers.common['Authorization'] = token;
+    this.token = token;
   },
 
   async getBalance(accountId: string): Promise<AccountBalance> {
     try {
-      const response = await axios.get(`${BASE_URL}/accounts/${accountId}`);
-      console.log('Raw API Response:', response.data); // Debug log
+      const response = await fetch(`${BASE_URL}/accounts/${accountId}`, {
+        headers: this.token ? { 'Authorization': this.token } : {}
+      });
 
-      // Ensure we have a valid balance value
-      const rawBalance = response.data.balance;
-      const balance = typeof rawBalance === 'number' ? rawBalance : Number(rawBalance);
-
-      if (typeof rawBalance === 'undefined' || rawBalance === null) {
-        throw new ApiError("Balance not found in response");
+      if (!response.ok) {
+        const errorText = await response.text();
+        try {
+          const errorJson = JSON.parse(errorText);
+          if (errorJson.error === "Account not initialized.") {
+            throw new ApiError("Account not initialized.");
+          }
+          throw new ApiError(errorJson.error);
+        } catch (e) {
+          throw new ApiError(errorText || response.statusText);
+        }
       }
 
+      const data = await response.json();
+      const balance = typeof data.balance === 'number' ? data.balance : parseInt(data.balance);
+
       if (isNaN(balance)) {
-        throw new ApiError(`Invalid balance value: ${rawBalance}`);
+        throw new ApiError("Invalid balance value received from server");
       }
 
       return {
         accountId: parseInt(accountId),
-        balance: balance
+        balance
       };
     } catch (error: any) {
-      console.log('API Error:', error.response?.data); // Debug log
-      if (error.response?.status === 404 && 
-          error.response?.data?.error === "Account not initialized.") {
-        throw new ApiError("Account not initialized.");
+      if (error instanceof ApiError) {
+        throw error;
       }
-      throw new ApiError(error.response?.data?.error || error.message);
+      throw new ApiError(error.message);
     }
   },
 
   async performTransaction(accountId: string, transaction: Transaction): Promise<void> {
-    await axios.post(`${BASE_URL}/accounts/${accountId}`, transaction);
+    const response = await fetch(`${BASE_URL}/accounts/${accountId}`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        ...(this.token ? { 'Authorization': this.token } : {})
+      },
+      body: JSON.stringify(transaction)
+    });
+
+    if (!response.ok) {
+      const errorText = await response.text();
+      try {
+        const errorJson = JSON.parse(errorText);
+        throw new ApiError(errorJson.error || errorText);
+      } catch (e) {
+        throw new ApiError(errorText || response.statusText);
+      }
+    }
   }
 };
