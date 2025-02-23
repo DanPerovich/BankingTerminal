@@ -1,5 +1,6 @@
 import { Card } from "@/components/ui/card";
 import { Skeleton } from "@/components/ui/skeleton";
+import { LoadingSpinner } from "./LoadingSpinner";
 
 interface DisplayProps {
   accountId: string;
@@ -16,7 +17,13 @@ export function Display({ accountId, balance, message, isLoading, error }: Displ
     <Card className="p-6 bg-gray-800 text-white min-h-[200px] flex flex-col justify-between">
       <div className="text-2xl font-bold mb-4">
         {isLoading ? (
-          <Skeleton className="h-8 w-3/4 bg-gray-700" />
+          <div className="space-y-4">
+            <Skeleton className="h-8 w-3/4 bg-gray-700" />
+            <div className="flex flex-col items-center gap-3">
+              <LoadingSpinner />
+              <div className="text-lg text-green-400">Processing transaction...</div>
+            </div>
+          </div>
         ) : (
           <div>
             <div className="text-sm text-gray-400 mb-2">Account ID: {accountId}</div>
