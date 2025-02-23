@@ -61,6 +61,9 @@ export default function ATM() {
   // Check if account is not initialized
   const isAccountNotInitialized = errorMessage?.includes("Account not initialized");
 
+  // Determine the display message
+  const displayMessage = amount ? `Amount: $${amount}` : "Enter amount";
+
   return (
     <div className="min-h-screen bg-gray-100 p-4">
       <div className="max-w-md mx-auto space-y-4">
@@ -77,9 +80,9 @@ export default function ATM() {
             <Display
               accountId={accountId}
               balance={balance?.balance}
-              message={amount ? `Amount: $${amount}` : "Enter amount"}
+              message={displayMessage}
               isLoading={isLoading || mutation.isPending}
-              error={errorMessage}
+              error={amount ? undefined : errorMessage} // Only show error if no amount is entered
             />
 
             <Keypad
