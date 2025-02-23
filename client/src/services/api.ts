@@ -20,14 +20,15 @@ export const api = {
       const response = await axios.get(`${BASE_URL}/accounts/${accountId}`);
       console.log('API Response:', response.data); // Debug log
 
-      // Handle the case where balance might be missing or null
-      if (response.data.balance === undefined || response.data.balance === null) {
-        throw new ApiError("Invalid balance in response");
+      // Convert the balance to a number, allowing 0 as a valid value
+      const balance = Number(response.data.balance);
+      if (isNaN(balance)) {
+        throw new ApiError("Invalid balance format in response");
       }
 
       return {
         accountId: parseInt(accountId),
-        balance: Number(response.data.balance) // Ensure numeric conversion
+        balance: balance
       };
     } catch (error: any) {
       console.log('API Error:', error.response?.data); // Debug log
