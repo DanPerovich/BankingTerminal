@@ -1,7 +1,5 @@
 import { AccountBalance, Transaction } from '@shared/schema';
 
-const BASE_URL = 'https://statefuldoublecontext.wiremockapi.cloud';
-
 class ApiError extends Error {
   constructor(message: string) {
     super(message);
@@ -11,21 +9,25 @@ class ApiError extends Error {
 
 export const api = {
   token: '',
+  baseUrl: 'https://statefuldoublecontext.wiremockapi.cloud',
 
   setAuthToken(token: string) {
     this.token = token;
   },
 
+  setBaseUrl(url: string) {
+    this.baseUrl = url.startsWith('http') ? url : `https://${url}`;
+  },
+
   async getBalance(accountId: string): Promise<AccountBalance> {
     try {
-      const response = await fetch(`${BASE_URL}/accounts/${accountId}`, {
+      const response = await fetch(`${this.baseUrl}/accounts/${accountId}`, {
         headers: this.token ? { 'Authorization': this.token } : {}
       });
 
       if (!response.ok) {
         const errorText = await response.text();
         try {
-          // Only try to parse as JSON if it starts with {
           if (errorText.trim().startsWith('{')) {
             const errorJson = JSON.parse(errorText);
             if (errorJson.error === "Account not initialized.") {
@@ -33,7 +35,6 @@ export const api = {
             }
             throw new ApiError(errorJson.error);
           }
-          // If it's not JSON, just use the text directly
           if (errorText.includes("Account not initialized")) {
             throw new ApiError("Account not initialized.");
           }
@@ -71,7 +72,7 @@ export const api = {
   },
 
   async performTransaction(accountId: string, transaction: Transaction): Promise<void> {
-    const response = await fetch(`${BASE_URL}/accounts/${accountId}`, {
+    const response = await fetch(`${this.baseUrl}/accounts/${accountId}`, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',

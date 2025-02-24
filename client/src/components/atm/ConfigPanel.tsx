@@ -4,6 +4,7 @@ import { Button } from "@/components/ui/button";
 import { Settings } from "lucide-react";
 import { useAuth } from "@/contexts/AuthContext";
 import { useState, useEffect } from "react";
+import { api } from "@/services/api";
 
 interface ConfigPanelProps {
   initiallyOpen?: boolean;
@@ -13,6 +14,7 @@ interface ConfigPanelProps {
 export function ConfigPanel({ initiallyOpen = false, onConfigChange }: ConfigPanelProps) {
   const { authToken, setAuthToken } = useAuth();
   const [tempToken, setTempToken] = useState(authToken);
+  const [tempBaseUrl, setTempBaseUrl] = useState('statefuldoublecontext.wiremockapi.cloud');
   const [open, setOpen] = useState(initiallyOpen);
 
   useEffect(() => {
@@ -21,6 +23,7 @@ export function ConfigPanel({ initiallyOpen = false, onConfigChange }: ConfigPan
 
   const handleSave = () => {
     setAuthToken(tempToken);
+    api.setBaseUrl(tempBaseUrl);
     setOpen(false);
     onConfigChange?.();
   };
@@ -37,6 +40,15 @@ export function ConfigPanel({ initiallyOpen = false, onConfigChange }: ConfigPan
           <DialogTitle>ATM Configuration</DialogTitle>
         </DialogHeader>
         <div className="space-y-4">
+          <div>
+            <label className="text-sm font-medium">API FQDN</label>
+            <Input
+              value={tempBaseUrl}
+              onChange={(e) => setTempBaseUrl(e.target.value)}
+              placeholder="Enter API FQDN"
+              className="mt-1"
+            />
+          </div>
           <div>
             <label className="text-sm font-medium">Authorization Header</label>
             <Input
