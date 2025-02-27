@@ -5,6 +5,7 @@ import { Keypad } from "@/components/atm/Keypad";
 import { ConfigPanel } from "@/components/atm/ConfigPanel";
 import { AccountSelector } from "@/components/atm/AccountSelector";
 import { Confetti } from "@/components/atm/Confetti";
+import { DevConsole } from "@/components/atm/DevConsole";
 import { api } from "@/services/api";
 import { useAuth } from "@/contexts/AuthContext";
 import { Card, CardContent } from "@/components/ui/card";
@@ -25,6 +26,7 @@ export default function ATM() {
   const [errorOverride, setErrorOverride] = useState<string | undefined>();
   const [showError, setShowError] = useState(true);
   const [showConfetti, setShowConfetti] = useState(false);
+  const [showDevConsole, setShowDevConsole] = useState(false);
   const { authToken } = useAuth();
 
   api.setAuthToken(authToken);
@@ -160,6 +162,12 @@ export default function ATM() {
           </CardContent>
         </Card>
       </div>
+
+      {/* Developer Console */}
+      <DevConsole 
+        isVisible={showDevConsole} 
+        onToggle={() => setShowDevConsole(!showDevConsole)} 
+      />
     </div>
   );
 }
