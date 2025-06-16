@@ -58,13 +58,16 @@ export function ConfigPanel({ initiallyOpen = false, onConfigChange }: ConfigPan
 
   const handleSave = () => {
     const fullUrl = `${protocol}://${hostname}`;
+    console.log('Saving configuration:', { protocol, hostname, fullUrl });
     
     if (!validateAndUpdateUrl(hostname, protocol)) {
       return;
     }
 
     setAuthToken(tempToken);
+    // Pass the full URL with protocol to ensure HTTP/HTTPS is preserved
     api.setBaseUrl(fullUrl);
+    console.log('API base URL set to:', api.baseUrl);
     setOpen(false);
     onConfigChange?.();
   };
@@ -78,7 +81,7 @@ export function ConfigPanel({ initiallyOpen = false, onConfigChange }: ConfigPan
           <Settings className="h-4 w-4" />
         </Button>
       </DialogTrigger>
-      <DialogContent className="sm:max-w-md">
+      <DialogContent className="sm:max-w-lg">
         <DialogHeader>
           <DialogTitle>ATM Configuration</DialogTitle>
         </DialogHeader>

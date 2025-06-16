@@ -63,15 +63,18 @@ export const api = {
   setBaseUrl(url: string) {
     // Validate and normalize the URL
     const trimmedUrl = url.trim();
+    console.log('Setting base URL:', trimmedUrl);
     
     // If it already has a protocol, use it as-is
     if (trimmedUrl.startsWith('http://') || trimmedUrl.startsWith('https://')) {
       this.baseUrl = trimmedUrl;
+      console.log('URL has protocol, using as-is:', this.baseUrl);
       return;
     }
     
     // If no protocol specified, default to https
     this.baseUrl = `https://${trimmedUrl}`;
+    console.log('No protocol specified, defaulting to HTTPS:', this.baseUrl);
   },
 
   // Helper method to validate URL format
