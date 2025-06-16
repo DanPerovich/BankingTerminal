@@ -134,9 +134,11 @@ export const api = {
       };
       this.addRequestToHistory(requestLog);
 
+      console.log('Making GET request to:', url);
       const response = await fetch(url, {
         headers
       });
+      console.log('Response received:', response.status, response.statusText);
 
       // Start logging the response
       let responseLog: ApiResponseLog = {
@@ -200,10 +202,19 @@ export const api = {
         balance
       };
     } catch (error: any) {
+      console.error('API request failed:', error);
+      
+      // Check for mixed content security errors
+      if (error.message.includes('Failed to fetch') && this.baseUrl.startsWith('http://')) {
+        const mixedContentError = 'HTTP requests blocked by browser security. The browser prevents HTTP requests when the page is loaded over HTTPS. Either use HTTPS for the API endpoint or access the app via HTTP.';
+        console.error('Mixed content error detected:', mixedContentError);
+        throw new ApiError(mixedContentError);
+      }
+      
       if (error instanceof ApiError) {
         throw error;
       }
-      throw new ApiError(error.message);
+      throw new ApiError(error.message || 'Network request failed');
     }
   },
 
@@ -228,11 +239,13 @@ export const api = {
     };
     this.addRequestToHistory(requestLog);
 
+    console.log('Making POST request to:', url);
     const response = await fetch(url, {
       method: 'POST',
       headers,
       body: JSON.stringify(transaction)
     });
+    console.log('Response received:', response.status, response.statusText);
 
     // Start logging the response
     let responseLog: ApiResponseLog = {
@@ -280,5 +293,22 @@ export const api = {
     }
 
     this.addResponseToHistory(responseLog);
+  },
+
+  // Add error handling wrapper for mixed content issues
+  async handleMixedContentError(error: any): Promise<never> {
+    console.error('API request failed:', error);
+    
+    // Check for mixed content security errors
+    if (error.message.includes('Failed to fetch') && this.baseUrl.startsWith('http://')) {
+      const mixedContentError = 'HTTP requests blocked by browser security. The browser prevents HTTP requests when the page is loaded over HTTPS. Either use HTTPS for the API endpoint or access the app via HTTP.';
+      console.error('Mixed content error detected:', mixedContentError);
+      throw new ApiError(mixedContentError);
+    }
+    
+    if (error instanceof ApiError) {
+      throw error;
+    }
+    throw new ApiError(error.message || 'Network request failed');
   }
 };

@@ -133,9 +133,23 @@ export function ConfigPanel({ initiallyOpen = false, onConfigChange }: ConfigPan
               </label>
             </div>
             {protocol === 'http' && (
-              <p className="text-xs text-orange-600">
-                Warning: HTTP connections are not encrypted
-              </p>
+              <div className="space-y-2 p-3 bg-orange-50 border border-orange-200 rounded-lg">
+                <div className="flex items-center gap-2">
+                  <AlertCircle className="h-4 w-4 text-orange-600" />
+                  <span className="text-sm font-medium text-orange-800">HTTP Security Warning</span>
+                </div>
+                <div className="text-xs text-orange-700 space-y-1">
+                  <p>• HTTP connections are not encrypted</p>
+                  <p>• Browser may block HTTP requests from HTTPS pages</p>
+                  <p>• To test HTTP endpoints, use: <a 
+                    href={`http://${window.location.host}`}
+                    target="_blank"
+                    className="underline text-blue-600 hover:text-blue-800"
+                  >
+                    http://{window.location.host}
+                  </a></p>
+                </div>
+              </div>
             )}
           </div>
 

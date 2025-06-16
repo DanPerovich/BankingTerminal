@@ -108,10 +108,14 @@ This is a full-stack ATM (Automated Teller Machine) simulation application built
 
 ## Recent Changes
 - June 16, 2025: Enhanced HTTP/HTTPS endpoint configuration support
-  - Added protocol selection (HTTP/HTTPS) in configuration panel
-  - Implemented URL validation with visual feedback
+  - Added protocol selection (HTTP/HTTPS) in configuration panel with radio buttons
+  - Implemented URL validation with visual feedback and error indicators
   - Enhanced security indicators for protocol selection
-  - Added support for both secure and insecure upstream API endpoints
+  - Added comprehensive mixed content security warning for HTTP endpoints
+  - Provided HTTP access link solution for testing HTTP APIs
+  - Fixed dialog width to properly accommodate form fields
+  - Added detailed error handling for mixed content security restrictions
+  - Implemented debug logging for endpoint configuration troubleshooting
 - June 16, 2025: Initial setup
 
 ## User Preferences
