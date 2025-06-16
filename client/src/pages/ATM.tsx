@@ -27,6 +27,7 @@ export default function ATM() {
   const [showError, setShowError] = useState(true);
   const [showConfetti, setShowConfetti] = useState(false);
   const [showDevConsole, setShowDevConsole] = useState(false);
+  const [isRefetchingBalance, setIsRefetchingBalance] = useState(false);
   const { authToken } = useAuth();
 
   api.setAuthToken(authToken);
@@ -44,20 +45,31 @@ export default function ATM() {
   }, [selectedAccount.id, authToken, refetch]);
 
   const mutation = useMutation({
-    mutationFn: (type: 'credit' | 'debit') => {
+    mutationFn: async (type: 'credit' | 'debit') => {
       const numericAmount = parseFloat(amount);
       const transaction = type === 'credit'
         ? { credit: numericAmount }
         : { debit: numericAmount };
-      return api.performTransaction(selectedAccount.id, transaction);
+      
+      // Perform the transaction
+      await api.performTransaction(selectedAccount.id, transaction);
+      
+      // Set refetching state and wait for balance update
+      setIsRefetchingBalance(true);
+      const updatedBalance = await refetch();
+      setIsRefetchingBalance(false);
+      
+      return updatedBalance;
     },
     onSuccess: () => {
-      refetch();
       setAmount("");
       setErrorOverride(undefined);
       setShowError(true);
       setShowConfetti(true);
       setTimeout(() => setShowConfetti(false), 2000);
+    },
+    onError: () => {
+      setIsRefetchingBalance(false);
     }
   });
 
@@ -133,7 +145,8 @@ export default function ATM() {
               accountId={selectedAccount.id}
               balance={balance?.balance}
               message={displayMessage}
-              isLoading={isLoading || mutation.isPending}
+              isLoading={isLoading || mutation.isPending || isRefetchingBalance}
+              isRefetchingBalance={isRefetchingBalance}
               error={showError ? errorMessage : undefined}
             />
 
@@ -146,14 +159,14 @@ export default function ATM() {
             <div className="grid grid-cols-2 gap-4">
               <Button
                 onClick={() => mutation.mutate('credit')}
-                disabled={!amount || mutation.isPending}
+                disabled={!amount || mutation.isPending || isRefetchingBalance}
                 className="bg-green-600 hover:bg-green-700"
               >
                 Credit
               </Button>
               <Button
                 onClick={() => mutation.mutate('debit')}
-                disabled={!amount || mutation.isPending || isAccountNotInitialized}
+                disabled={!amount || mutation.isPending || isRefetchingBalance || isAccountNotInitialized}
                 className="bg-blue-600 hover:bg-blue-700"
               >
                 Debit

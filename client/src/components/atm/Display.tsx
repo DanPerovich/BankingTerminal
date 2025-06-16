@@ -7,10 +7,11 @@ interface DisplayProps {
   balance?: number;
   message: string;
   isLoading: boolean;
+  isRefetchingBalance?: boolean;
   error?: string;
 }
 
-export function Display({ accountId, balance, message, isLoading, error }: DisplayProps) {
+export function Display({ accountId, balance, message, isLoading, isRefetchingBalance, error }: DisplayProps) {
   const isUninitializedError = error?.includes("Account not initialized");
 
   return (
@@ -21,7 +22,9 @@ export function Display({ accountId, balance, message, isLoading, error }: Displ
             <Skeleton className="h-8 w-3/4 bg-gray-700" />
             <div className="flex flex-col items-center gap-3">
               <LoadingSpinner />
-              <div className="text-lg text-green-400">Processing transaction...</div>
+              <div className="text-lg text-green-400">
+                {isRefetchingBalance ? "Updating balance..." : "Processing transaction..."}
+              </div>
             </div>
           </div>
         ) : (
