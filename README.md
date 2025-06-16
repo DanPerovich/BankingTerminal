@@ -28,19 +28,21 @@ HTTP_MODE=true npm run dev
 
 ## API Endpoint Configuration
 
-### HTTPS Endpoints (Recommended)
+### HTTPS Endpoints (Production/Remote)
 1. Click the settings gear icon
-2. Select "HTTPS (Secure)" protocol
+2. HTTPS protocol is automatically enforced for production deployments
 3. Enter your API hostname
 4. Save configuration
 
-### HTTP Endpoints (Development)
+### HTTP Endpoints (Local Development Only)
 1. Start the app in HTTP mode using `./start-http.sh`
 2. Access via `http://localhost:5000`
 3. Click the settings gear icon
-4. Select "HTTP (Insecure)" protocol
+4. Select "HTTP (Development)" protocol (only visible on localhost)
 5. Enter your API hostname
 6. Save configuration
+
+**Note:** HTTP protocol selection is only available when running on developer workstations (localhost, 127.0.0.1, .local domains, or custom ports).
 
 ## Environment Detection
 
