@@ -24,8 +24,12 @@ export function ConfigPanel({ initiallyOpen = false, onConfigChange }: ConfigPan
 
   useEffect(() => {
     setTempToken(authToken);
-    // Check if running on localhost
-    setIsLocalHost(window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1');
+    // Check if running on localhost/development environment
+    const isDev = window.location.hostname === 'localhost' || 
+                  window.location.hostname === '127.0.0.1' ||
+                  window.location.hostname.includes('.local') ||
+                  window.location.port !== '';
+    setIsLocalHost(isDev);
     
     // Parse current API base URL to set initial values
     const currentProtocol = api.getCurrentProtocol();
@@ -34,6 +38,11 @@ export function ConfigPanel({ initiallyOpen = false, onConfigChange }: ConfigPan
       setProtocol(currentProtocol);
       setHostname(currentHostname);
       setTempBaseUrl(currentHostname);
+    }
+    
+    // Force HTTPS when not in local development
+    if (!isDev && protocol === 'http') {
+      setProtocol('https');
     }
   }, [authToken]);
 
@@ -110,57 +119,49 @@ export function ConfigPanel({ initiallyOpen = false, onConfigChange }: ConfigPan
           {/* Protocol Selection */}
           <div className="space-y-3">
             <label className="text-sm font-medium">Protocol</label>
-            <div className="flex gap-4">
-              <label className="flex items-center gap-2 cursor-pointer">
-                <input
-                  type="radio"
-                  name="protocol"
-                  value="https"
-                  checked={protocol === 'https'}
-                  onChange={(e) => handleProtocolChange(e.target.value as 'https')}
-                  className="text-green-600"
-                />
+            {isLocalHost ? (
+              <div className="flex gap-4">
+                <label className="flex items-center gap-2 cursor-pointer">
+                  <input
+                    type="radio"
+                    name="protocol"
+                    value="https"
+                    checked={protocol === 'https'}
+                    onChange={(e) => handleProtocolChange(e.target.value as 'https')}
+                    className="text-green-600"
+                  />
+                  <Shield className="h-4 w-4 text-green-600" />
+                  <span className="text-sm">HTTPS (Secure)</span>
+                </label>
+                <label className="flex items-center gap-2 cursor-pointer">
+                  <input
+                    type="radio"
+                    name="protocol"
+                    value="http"
+                    checked={protocol === 'http'}
+                    onChange={(e) => handleProtocolChange(e.target.value as 'http')}
+                    className="text-orange-600"
+                  />
+                  <ShieldAlert className="h-4 w-4 text-orange-600" />
+                  <span className="text-sm">HTTP (Development)</span>
+                </label>
+              </div>
+            ) : (
+              <div className="flex items-center gap-2 p-3 bg-green-50 border border-green-200 rounded-lg">
                 <Shield className="h-4 w-4 text-green-600" />
-                <span className="text-sm">HTTPS (Secure)</span>
-              </label>
-              <label className="flex items-center gap-2 cursor-pointer">
-                <input
-                  type="radio"
-                  name="protocol"
-                  value="http"
-                  checked={protocol === 'http'}
-                  onChange={(e) => handleProtocolChange(e.target.value as 'http')}
-                  className="text-orange-600"
-                />
-                <ShieldAlert className="h-4 w-4 text-orange-600" />
-                <span className="text-sm">HTTP (Insecure)</span>
-              </label>
-            </div>
-            {protocol === 'http' && (
+                <span className="text-sm text-green-800">HTTPS (Secure) - Production Mode</span>
+              </div>
+            )}
+            {protocol === 'http' && isLocalHost && (
               <div className="space-y-2 p-3 bg-orange-50 border border-orange-200 rounded-lg">
                 <div className="flex items-center gap-2">
                   <AlertCircle className="h-4 w-4 text-orange-600" />
-                  <span className="text-sm font-medium text-orange-800">HTTP Configuration</span>
+                  <span className="text-sm font-medium text-orange-800">Development Mode</span>
                 </div>
                 <div className="text-xs text-orange-700 space-y-1">
                   <p>• HTTP connections are not encrypted</p>
-                  {!isLocalHost ? (
-                    <>
-                      <p>• Browser blocks HTTP requests from HTTPS pages</p>
-                      <p>• Access via HTTP to test: <a 
-                        href={`http://${window.location.host}`}
-                        target="_blank"
-                        className="underline text-blue-600 hover:text-blue-800"
-                      >
-                        http://{window.location.host}
-                      </a></p>
-                    </>
-                  ) : (
-                    <>
-                      <p>• Running on localhost - HTTP endpoints should work</p>
-                      <p>• For production, start server with HTTP_MODE=true</p>
-                    </>
-                  )}
+                  <p>• Only available for local development</p>
+                  <p>• Start with HTTP_MODE=true or use ./start-http.sh</p>
                 </div>
               </div>
             )}
