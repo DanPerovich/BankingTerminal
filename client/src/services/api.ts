@@ -61,7 +61,55 @@ export const api = {
   },
 
   setBaseUrl(url: string) {
-    this.baseUrl = url.startsWith('http') ? url : `https://${url}`;
+    // Validate and normalize the URL
+    const trimmedUrl = url.trim();
+    
+    // If it already has a protocol, use it as-is
+    if (trimmedUrl.startsWith('http://') || trimmedUrl.startsWith('https://')) {
+      this.baseUrl = trimmedUrl;
+      return;
+    }
+    
+    // If no protocol specified, default to https
+    this.baseUrl = `https://${trimmedUrl}`;
+  },
+
+  // Helper method to validate URL format
+  isValidUrl(url: string): boolean {
+    try {
+      const trimmedUrl = url.trim();
+      
+      // Check if it's a valid URL with http or https protocol
+      if (trimmedUrl.startsWith('http://') || trimmedUrl.startsWith('https://')) {
+        new URL(trimmedUrl);
+        return true;
+      }
+      
+      // Check if it's a valid hostname/domain that we can add protocol to
+      if (trimmedUrl && !trimmedUrl.includes('://')) {
+        new URL(`https://${trimmedUrl}`);
+        return true;
+      }
+      
+      return false;
+    } catch {
+      return false;
+    }
+  },
+
+  // Helper method to get protocol from current base URL
+  getCurrentProtocol(): 'http' | 'https' {
+    return this.baseUrl.startsWith('https://') ? 'https' : 'http';
+  },
+
+  // Helper method to get hostname from current base URL
+  getCurrentHostname(): string {
+    try {
+      const url = new URL(this.baseUrl);
+      return url.hostname;
+    } catch {
+      return '';
+    }
   },
 
   async getBalance(accountId: string): Promise<AccountBalance> {
