@@ -59,11 +59,17 @@ app.use((req, res, next) => {
   // ALWAYS serve the app on port 5000
   // this serves both the API and the client
   const port = 5000;
+  const isHttpMode = process.env.HTTP_MODE === 'true';
+  const protocol = isHttpMode ? 'HTTP' : 'HTTPS';
+  
   server.listen({
     port,
     host: "0.0.0.0",
     reusePort: true,
   }, () => {
-    log(`serving on port ${port}`);
+    log(`serving on port ${port} (${protocol} mode)`);
+    if (isHttpMode) {
+      log(`HTTP mode enabled - access via http://localhost:${port}`);
+    }
   });
 })();

@@ -107,12 +107,15 @@ This is a full-stack ATM (Automated Teller Machine) simulation application built
 - **Node Version**: 20.x LTS
 
 ## Recent Changes
-- June 16, 2025: Enhanced HTTP/HTTPS endpoint configuration support
+- June 16, 2025: Complete HTTP/HTTPS development environment support
   - Added protocol selection (HTTP/HTTPS) in configuration panel with radio buttons
   - Implemented URL validation with visual feedback and error indicators
   - Enhanced security indicators for protocol selection
   - Added comprehensive mixed content security warning for HTTP endpoints
-  - Provided HTTP access link solution for testing HTTP APIs
+  - Created HTTP development mode with environment variable support (HTTP_MODE=true)
+  - Added localhost environment detection for HTTP endpoint compatibility
+  - Created start-http.sh script for easy HTTP development mode activation
+  - Provided comprehensive README with HTTP/HTTPS development guide
   - Fixed dialog width to properly accommodate form fields
   - Added detailed error handling for mixed content security restrictions
   - Implemented debug logging for endpoint configuration troubleshooting

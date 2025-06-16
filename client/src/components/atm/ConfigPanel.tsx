@@ -20,9 +20,13 @@ export function ConfigPanel({ initiallyOpen = false, onConfigChange }: ConfigPan
   const [hostname, setHostname] = useState('statefuldoublecontext.wiremockapi.cloud');
   const [open, setOpen] = useState(initiallyOpen);
   const [urlError, setUrlError] = useState<string>('');
+  const [isLocalHost, setIsLocalHost] = useState(false);
 
   useEffect(() => {
     setTempToken(authToken);
+    // Check if running on localhost
+    setIsLocalHost(window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1');
+    
     // Parse current API base URL to set initial values
     const currentProtocol = api.getCurrentProtocol();
     const currentHostname = api.getCurrentHostname();
@@ -136,18 +140,27 @@ export function ConfigPanel({ initiallyOpen = false, onConfigChange }: ConfigPan
               <div className="space-y-2 p-3 bg-orange-50 border border-orange-200 rounded-lg">
                 <div className="flex items-center gap-2">
                   <AlertCircle className="h-4 w-4 text-orange-600" />
-                  <span className="text-sm font-medium text-orange-800">HTTP Security Warning</span>
+                  <span className="text-sm font-medium text-orange-800">HTTP Configuration</span>
                 </div>
                 <div className="text-xs text-orange-700 space-y-1">
                   <p>• HTTP connections are not encrypted</p>
-                  <p>• Browser may block HTTP requests from HTTPS pages</p>
-                  <p>• To test HTTP endpoints, use: <a 
-                    href={`http://${window.location.host}`}
-                    target="_blank"
-                    className="underline text-blue-600 hover:text-blue-800"
-                  >
-                    http://{window.location.host}
-                  </a></p>
+                  {!isLocalHost ? (
+                    <>
+                      <p>• Browser blocks HTTP requests from HTTPS pages</p>
+                      <p>• Access via HTTP to test: <a 
+                        href={`http://${window.location.host}`}
+                        target="_blank"
+                        className="underline text-blue-600 hover:text-blue-800"
+                      >
+                        http://{window.location.host}
+                      </a></p>
+                    </>
+                  ) : (
+                    <>
+                      <p>• Running on localhost - HTTP endpoints should work</p>
+                      <p>• For production, start server with HTTP_MODE=true</p>
+                    </>
+                  )}
                 </div>
               </div>
             )}
