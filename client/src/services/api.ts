@@ -312,3 +312,11 @@ export const api = {
     throw new ApiError(error.message || 'Network request failed');
   }
 };
+
+// Auto-configure from ?host= query string parameter so the demo helper
+// can link directly to the BankingTerminal with the provisioned mock API
+// pre-populated (e.g. http://localhost:5001/?host=abc12.wiremockapi.cloud).
+const _hostParam = new URLSearchParams(window.location.search).get('host');
+if (_hostParam) {
+  api.setBaseUrl(_hostParam);
+}
