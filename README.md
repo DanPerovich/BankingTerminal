@@ -66,6 +66,37 @@ This indicates mixed content security restrictions. Solutions:
 ### Browser Console Debugging
 Check the browser console (F12) for detailed error messages and request logging.
 
+## AWS Deployment (S3 + CloudFront)
+
+The static client is hosted on S3 and served via CloudFront.
+
+- **S3 bucket:** `wmc-banking-terminal-app`
+- **CloudFront distribution ID:** `E2QILOJYL6K5AL`
+
+### Deploying updates
+
+Build the client and sync to S3, then invalidate the CloudFront cache:
+
+```bash
+npm run build \
+  && aws s3 sync dist/public/ s3://wmc-banking-terminal-app/ --delete \
+  && aws cloudfront create-invalidation --distribution-id E2QILOJYL6K5AL --paths "/*"
+```
+
+The `--delete` flag removes files from S3 that no longer exist in the build output.
+The CloudFront invalidation ensures visitors get the latest version immediately rather than waiting for the cache TTL to expire.
+
+If you only changed a small number of files you can target specific paths in the invalidation (the first 1,000 invalidation paths per month are free; additional paths incur a charge):
+
+```bash
+aws cloudfront create-invalidation --distribution-id E2QILOJYL6K5AL --paths "/index.html" "/favicon.png"
+```
+
+### Prerequisites
+
+- [AWS CLI](https://docs.aws.amazon.com/cli/latest/userguide/install-cliv2.html) installed and configured (`aws configure`)
+- IAM credentials with `s3:PutObject`, `s3:DeleteObject`, `s3:ListBucket`, and `cloudfront:CreateInvalidation` permissions
+
 ## Developer Features
 
 - Real-time API request/response logging
